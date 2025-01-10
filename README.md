@@ -44,7 +44,7 @@ pip install requests
 ### Step 3: Run the Script
 
 ```bash
-python3 luhn_validator.py
+python3 luhn_wizard.py
 ```
 
 ---
