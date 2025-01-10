@@ -1,15 +1,14 @@
-# Luhn Wizard - v1
+# Luhn Validator Wizard
 
-This repository contains a Bash script that automates the setup and running of a Luhn Validator Wizard. The wizard helps validate single card numbers or batches of card numbers from a file using the Luhn algorithm.
+This repository contains a Python script that validates card numbers using the Luhn algorithm, fetches BIN details using the Binlist API, and generates professional JSON reports for single and batch validations.
 
 ## Features
 
-- Automates the installation of **Node.js** and **npm** if not already installed.
-- Clones the [Paylike Luhn](https://github.com/paylike/luhn) repository for Luhn validation.
-- Automatically installs dependencies required for the Luhn Validator.
-- Runs a wizard to:
-  - Validate a single card number.
-  - Validate a batch of card numbers from a file.
+- **Luhn Algorithm Validation**: Checks the validity of card numbers.
+- **BIN Details Fetching**: Fetches additional details for valid card numbers using the [Binlist API](https://binlist.net/).
+- **JSON Reports**:
+  - Generates structured JSON reports for both single and batch validations.
+  - Saves reports to `luhn_validation_report.json`.
 
 ---
 
@@ -22,39 +21,44 @@ git clone https://github.com/exfil0/luhn-wizard.git
 cd luhn-wizard
 ```
 
-### Step 2: Make the Script Executable
+### Step 2: Install Dependencies
+
+Ensure Python is installed on your system:
 
 ```bash
-chmod +x luhn-wizard.sh
+python3 --version
+```
+
+If Python is not installed, install it:
+
+```bash
+sudo apt update && sudo apt install -y python3
+```
+
+Additionally, install the `requests` library if not already installed:
+
+```bash
+pip install requests
 ```
 
 ### Step 3: Run the Script
 
 ```bash
-./luhn-wizard.sh
+python3 luhn_validator.py
 ```
-
----
-
-## What Happens When You Run the Script?
-
-1. **Checks for Node.js**: Installs Node.js and npm if not present.
-2. **Clones the Luhn Repository**: If the Luhn repository is not already present, it will be cloned.
-3. **Installs Dependencies**: Installs required Node.js packages for Luhn validation.
-4. **Launches the Wizard**: Automatically starts the Luhn Validator Wizard.
 
 ---
 
 ## Wizard Options
 
-1. **Validate a Single Card Number**: Enter a test card number to validate, and the script will determine its validity using the Luhn algorithm.
-2. **Validate Batch Card Numbers**: Provide a file path containing card numbers (one per line), and the wizard will validate all numbers in the file.
+1. **Validate a Single Card Number**: Enter a card number to validate its validity and fetch BIN details. The result is saved as a JSON report.
+2. **Validate Batch Card Numbers**: Provide a file path containing card numbers (one per line) for validation and BIN details fetching. The results are saved as a batch JSON report.
 
 ---
 
 ## Example Output
 
-### Single Card Number Validation
+### Single Card Validation
 ```bash
 Welcome to the Luhn Validator Wizard!
 1. Validate a single card number
@@ -62,9 +66,21 @@ Welcome to the Luhn Validator Wizard!
 Choose an option (1 or 2): 1
 Enter the card number to validate: 4111111111111111
 The PAN 4111111111111111 is valid.
+Fetching BIN details...
+BIN details:
+{
+    "scheme": "visa",
+    "type": "debit",
+    "brand": "Visa Debit",
+    "bank": {
+        "name": "Example Bank",
+        "country": "US"
+    }
+}
+Report saved to luhn_validation_report.json
 ```
 
-### Batch Card Number Validation
+### Batch Card Validation
 ```bash
 Welcome to the Luhn Validator Wizard!
 1. Validate a single card number
@@ -72,20 +88,41 @@ Welcome to the Luhn Validator Wizard!
 Choose an option (1 or 2): 2
 Enter the file path containing card numbers: test-cards.txt
 Card 1 (4111111111111111): valid
+BIN details:
+{
+    "scheme": "visa",
+    "type": "debit",
+    "brand": "Visa Debit",
+    "bank": {
+        "name": "Example Bank",
+        "country": "US"
+    }
+}
 Card 2 (1234567812345670): invalid
-Card 3 (4000000000000002): valid
+Card 3 (4000001234567899): valid
+BIN details:
+{
+    "scheme": "visa",
+    "type": "credit",
+    "brand": "Visa",
+    "bank": {
+        "name": "Another Bank",
+        "country": "UK"
+    }
+}
+Batch report saved to luhn_validation_report.json
 ```
 
 ---
 
 ## Notes
 
-- The script assumes a Debian-based Linux distribution (e.g., Ubuntu, Kali).
-- Ensure you have necessary permissions to install software if running the script on a fresh system.
+- The script uses the [Binlist API](https://binlist.net/) to fetch BIN details. Ensure your internet connection is active.
+- Ensure the card numbers provided are in the correct format (12-19 digits).
+- JSON reports are saved to `luhn_validation_report.json` in the current directory.
 
 ---
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
