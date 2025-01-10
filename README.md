@@ -120,9 +120,3 @@ Batch report saved to luhn_validation_report.json
 - The script uses the [Binlist API](https://binlist.net/) to fetch BIN details. Ensure your internet connection is active.
 - Ensure the card numbers provided are in the correct format (12-19 digits).
 - JSON reports are saved to `luhn_validation_report.json` in the current directory.
-
----
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
