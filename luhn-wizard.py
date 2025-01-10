@@ -1,5 +1,7 @@
 import requests
 import re
+import json
+from datetime import datetime
 
 # Function to validate the card number using Luhn's algorithm
 def luhn_check(card_number):
@@ -34,13 +36,26 @@ def validate_single_card():
 
     is_valid = luhn_check(card_number)
     bin_number = card_number[:6]
+    result = {
+        "card_number": card_number,
+        "is_valid": is_valid,
+        "bin_details": None,
+        "timestamp": datetime.now().isoformat()
+    }
+
     print(f"The PAN {card_number} is {'valid' if is_valid else 'invalid'}.")
 
     if is_valid:
         print("Fetching BIN details...")
         bin_details = fetch_bin_details(bin_number)
+        result["bin_details"] = bin_details
         print("BIN details:")
         print(bin_details)
+
+    # Save the result to a JSON file
+    with open("luhn_validation_report.json", "w") as file:
+        json.dump(result, file, indent=4)
+    print("Report saved to luhn_validation_report.json")
 
 # Function to validate a batch of card numbers
 def validate_batch_cards():
@@ -49,20 +64,43 @@ def validate_batch_cards():
         with open(file_path, "r") as file:
             card_numbers = file.read().splitlines()
 
+        results = []
+
         for index, card_number in enumerate(card_numbers, start=1):
             if not re.match(r"^\d{12,19}$", card_number):
                 print(f"Card {index} ({card_number}): invalid format.")
+                results.append({
+                    "card_number": card_number,
+                    "is_valid": False,
+                    "error": "Invalid format",
+                    "timestamp": datetime.now().isoformat()
+                })
                 continue
 
             is_valid = luhn_check(card_number)
             bin_number = card_number[:6]
+            result = {
+                "card_number": card_number,
+                "is_valid": is_valid,
+                "bin_details": None,
+                "timestamp": datetime.now().isoformat()
+            }
+
             print(f"Card {index} ({card_number}): {'valid' if is_valid else 'invalid'}.")
 
             if is_valid:
                 print("Fetching BIN details...")
                 bin_details = fetch_bin_details(bin_number)
+                result["bin_details"] = bin_details
                 print("BIN details:")
                 print(bin_details)
+
+            results.append(result)
+
+        # Save the results to a JSON file
+        with open("luhn_validation_report.json", "w") as file:
+            json.dump(results, file, indent=4)
+        print("Batch report saved to luhn_validation_report.json")
 
     except FileNotFoundError:
         print("File not found. Please provide a valid file path.")
